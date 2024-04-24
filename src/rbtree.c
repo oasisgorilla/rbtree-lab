@@ -1,5 +1,5 @@
 #include "rbtree.h"
-
+#include <stdio.h>
 #include <stdlib.h>
 
 rbtree *new_rbtree(void) {
@@ -199,17 +199,40 @@ node_t *rbtree_insert(rbtree *t, const key_t key) {
 
 node_t *rbtree_find(const rbtree *t, const key_t key) {
   // TODO: implement find
-  return t->root;
+  if (t->root == NULL) {
+    return t->root;
+  }
+  node_t *cur = t->root;
+
+  while (cur != t->nil && key != cur->key) {
+    if (key < cur->key) {
+      cur = cur->left;
+    } else {
+      cur = cur->right;
+    }
+  }
+  if (cur == t->nil) {
+    return NULL;
+  }
+  return cur; // 찾은 노드 return, 없으면 NULL 반환
 }
 
 node_t *rbtree_min(const rbtree *t) {
   // TODO: implement find
-  return t->root;
+  node_t *cur = t->root;
+  while(cur->left != t->nil){
+    cur = cur->left;
+  }
+  return cur;
 }
 
 node_t *rbtree_max(const rbtree *t) {
   // TODO: implement find
-  return t->root;
+  node_t *cur = t->root;
+  while(cur->right != t->nil){
+    cur = cur->right;
+  }
+  return cur;
 }
 /////////////////////////////////////transplant 함수/////////////////////////////////////
 void transplant(rbtree *t, node_t *u, node_t *v) { // 트리의 root인 u를 v로 교체 
@@ -312,18 +335,42 @@ int rbtree_erase(rbtree *t, node_t *p) {
     replacement->left = p->left; // 대체노드에 삭제노드의 left연결
     replacement->left->parent = replacement; // ''
     replacement->color = p->color; // 삭제노드의 색 계승
+  }
   if (original_color == RBTREE_BLACK) { // 삭제된 노드의 색상이 black일 경우
     rbtree_erase_fixup(t, child); // fixup 호출
   }
-
-  }
+  free(p); // 노드 메모리 할당해제
   return 0;
+}
+
+void inorder_to_arr(const rbtree *t, node_t *n, key_t *arr, size_t *idx, size_t size) {
+  if (n == t->nil){
+    return;
+  } else {
+    inorder_to_arr(t, n->left, arr, idx, size);
+    arr[(*idx)] = n->key;
+    (*idx)++;
+    if ((*idx) == size) {
+      return;
+    }
+    inorder_to_arr(t, n->right, arr, idx, size);
+  }
+
 }
 
 int rbtree_to_array(const rbtree *t, key_t *arr, const size_t n) {
   // TODO: implement to_array
+  // 중위순회하며 삽입해야 함
+  if(t == NULL || arr == NULL || n == 0){
+    return -1;
+  }
+
+  size_t idx = 0;
+  inorder_to_arr(t, t->root, arr, &idx, n);
+
   return 0;
 }
+
 
 // // 트리를 출력하는 함수
 // void print_rbtree(rbtree *t, node_t *node, int space)
@@ -358,4 +405,56 @@ int rbtree_to_array(const rbtree *t, key_t *arr, const size_t n) {
 //   delete_rbtree(t);
 
 //   return 0;
+// }
+
+// // erase to array 테스트
+// size_t rbtree_size_helper(node_t *node, node_t *sentinel_node) {
+//     if (node == sentinel_node) // 노드가 더 이상 없으면 0 반환
+//         return 0;
+//     else
+//         return 1 + rbtree_size_helper(node->left, sentinel_node) + rbtree_size_helper(node->right, sentinel_node);
+// }
+
+// size_t rbtree_size(const rbtree *t) {
+//     // 빈 트리인 경우 크기는 0
+//     if (t == NULL || t->root == t->nil)
+//         return 0;
+//     // 루트 노드부터 시작하여 트리의 크기 계산
+//     return rbtree_size_helper(t->root, t->nil);
+// }
+
+// int main() {
+//     // 새로운 레드-블랙 트리 생성
+//     rbtree *t = new_rbtree();
+    
+//     // 트리에 임의의 값들을 삽입
+//     rbtree_insert(t, 10);
+//     rbtree_insert(t, 5);
+//     rbtree_insert(t, 15);
+//     rbtree_insert(t, 3);
+//     rbtree_insert(t, 7);
+//     rbtree_insert(t, 12);
+//     rbtree_insert(t, 20);
+
+//     // 중위 순회를 통해 배열로 변환
+//     key_t *arr = (key_t*)malloc(rbtree_size(t) * sizeof(key_t)); // 트리의 노드 수만큼 배열 할당
+//     int result = rbtree_to_array(t, arr, rbtree_size(t));
+    
+//     if (result == -1) {
+//         printf("Error: Invalid input or empty tree.\n");
+//         return 1;
+//     }
+    
+//     // 배열 출력
+//     printf("Array from inorder traversal of the red-black tree:\n");
+//     for (size_t i = 0; i < rbtree_size(t); i++) {
+//         printf("%d ", arr[i]);
+//     }
+//     printf("\n");
+
+//     // 메모리 해제
+//     free(arr);
+//     delete_rbtree(t);
+
+//     return 0;
 // }
