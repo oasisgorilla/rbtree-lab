@@ -343,6 +343,7 @@ int rbtree_erase(rbtree *t, node_t *p) {
   return 0;
 }
 
+
 void inorder_to_arr(const rbtree *t, node_t *n, key_t *arr, size_t *idx, size_t size) {
   if (n == t->nil){
     return;
@@ -358,6 +359,7 @@ void inorder_to_arr(const rbtree *t, node_t *n, key_t *arr, size_t *idx, size_t 
 
 }
 
+
 int rbtree_to_array(const rbtree *t, key_t *arr, const size_t n) {
   // TODO: implement to_array
   // 중위순회하며 삽입해야 함
@@ -372,7 +374,7 @@ int rbtree_to_array(const rbtree *t, key_t *arr, const size_t n) {
 }
 
 
-// // 트리를 출력하는 함수
+// 트리를 출력하는 함수
 // void print_rbtree(rbtree *t, node_t *node, int space)
 // {
 //   if (node == t->nil)
@@ -407,7 +409,7 @@ int rbtree_to_array(const rbtree *t, key_t *arr, const size_t n) {
 //   return 0;
 // }
 
-// // erase to array 테스트
+// erase to array 테스트
 // size_t rbtree_size_helper(node_t *node, node_t *sentinel_node) {
 //     if (node == sentinel_node) // 노드가 더 이상 없으면 0 반환
 //         return 0;
